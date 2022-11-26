@@ -66,7 +66,8 @@ public class MessageUpdateService : IHostedService
         if (update.Message is not { } message)
             return Task.CompletedTask;
 
-        _logger.LogDebug("Received a [{UpdateType}|{MessageType}] from {ChatId}: {Text}", update.Type, update.Message.Type,
+        _logger.LogDebug("Received a [{UpdateType}|{MessageType}] from {ChatId}: {Text}", update.Type,
+            update.Message.Type,
             update.Message.Chat.Id, update.Message.Text);
 
         // Only process text messages
@@ -76,10 +77,11 @@ public class MessageUpdateService : IHostedService
         // Only process text messages
         if (message.From is not { } from)
             return Task.CompletedTask;
-        
+
         var chatInfo =
-            new ChatInformation(update.Message.Chat.Id, from.Id, from.FirstName, from.LastName, from.Username);
-        
+            new ChatInformation(update.Message.Chat.Id, from.Id, from.FirstName, from.LastName ?? string.Empty,
+                from.Username ?? string.Empty);
+
         var chatId = message.Chat.Id;
         if (message.Entities?.Length > 0)
         {
@@ -99,7 +101,7 @@ public class MessageUpdateService : IHostedService
                 {
                     var start = entity.Offset + entity.Length;
                     parameter = message.Text
-                        .Substring( start, message.Entities[i + 1].Offset - start)
+                        .Substring(start, message.Entities[i + 1].Offset - start)
                         .Split(' ');
                 }
 

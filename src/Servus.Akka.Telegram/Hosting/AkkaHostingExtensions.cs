@@ -11,7 +11,7 @@ public static class AkkaHostingExtensions
         return builder.WithActors((system, registry) =>
         {
             var commandRegistry = CommandRegistry.For(system);
-            commandRegistry.RegisterCommand(commandName, paramCount, joinParams, requiredRole, DependencyResolver.For(system).Props<T>());
+            commandRegistry.RegisterCommand(commandName, paramCount, joinParams, requiredRole, (user) => DependencyResolver.For(system).Props<T>(user));
         });
     }
 }

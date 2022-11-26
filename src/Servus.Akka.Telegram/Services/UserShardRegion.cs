@@ -16,7 +16,7 @@ public class UserShardRegion : ReceiveActor
     private readonly IServiceScope _scope;
     private readonly IBotUserRepository _userRepository;
     private BotUser _user = new();
-    private CommandRegistry _commandRegistry;
+    private readonly CommandRegistry _commandRegistry;
 
     public UserShardRegion(long userId, IServiceProvider sp, ILogger<UserShardRegion> logger)
     {
@@ -24,11 +24,11 @@ public class UserShardRegion : ReceiveActor
         _logger = logger;
         _scope = sp.CreateScope();
         _userRepository = _scope.ServiceProvider.GetRequiredService<IBotUserRepository>();
-        _logger.LogDebug("Staring up new shard entity for user {UserId}", userId);      
+        _logger.LogDebug("Staring up new shard entity for user {UserId}", userId);
+        _commandRegistry = CommandRegistry.For(Context.System);  
     }
     protected override void PreStart()
     {
-        _commandRegistry = CommandRegistry.For(Context.System);
         _userRepository.GetBotUser(_userId).Some(u =>
         { 
             _user = u;
@@ -36,7 +36,7 @@ public class UserShardRegion : ReceiveActor
             {
                 Become(Ready);
             }
-            else
+            else if(!_user.IsBanned)
             {
                 Become(Disabled);
             }
@@ -61,7 +61,7 @@ public class UserShardRegion : ReceiveActor
                     worker = Context.ActorOf(props, safeCommandName);
                 }
                 
-                worker.Tell(msg);
+                worker.Tell(new CommandMessage(msg.ChatInformation, msg.Parameters));
             });
         });
         

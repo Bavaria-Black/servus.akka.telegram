@@ -25,23 +25,6 @@ using Servus.Akka.Telegram.TestBot.Services;
 using Servus.Akka.Telegram.Users;
 using Telegram.Bot;
 
-const int NumberOfShards = 5;
-
-static Option<(string, object)> ExtractEntityId(object message)
-    => message switch
-    {
-        string id => (id, id),
-        _ => Option<(string, object)>.None
-    };
-
-static string? ExtractShardId(object message)
-    => message switch
-    {
-        string id => (id.GetHashCode() % NumberOfShards).ToString(),
-        _ => null
-    };
-
-
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
@@ -62,7 +45,10 @@ var host = Host.CreateDefaultBuilder(args)
 
         // Register Bot configuration
         services.Configure<BotConfiguration>(
-            context.Configuration.GetSection(BotConfiguration.Configuration));
+            context.Configuration.GetSection(BotConfiguration.SectionName));
+        // Register Bot configuration
+        services.Configure<UserRegistrationConfiguration>(
+            context.Configuration.GetSection(UserRegistrationConfiguration.SectionName));
         // Register mongo  configuration
         services.Configure<MongoConfiguration>(
             context.Configuration.GetSection(MongoConfiguration.Configuration));
@@ -112,7 +98,7 @@ var host = Host.CreateDefaultBuilder(args)
                         {
                             Role = "user-shard"
                         }
-                    ).WithCommandWorker<StartCommandWorker>("/start", 0, false, string.Empty);
+                    ).WithCommandWorker<StartCommandWorker>("/start", 1, false, string.Empty);
             })
             .AddScoped<IBotUserRepository, BotUserRepository>()
             .AddScoped(s =>

@@ -1,15 +1,19 @@
 using Akka.Actor;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver.Core.WireProtocol.Messages;
+using Servus.Akka.Telegram.Messages;
+using Servus.Akka.Telegram.Users;
 
 namespace Servus.Akka.Telegram.TestBot.MessageProcessing;
 
-public class StartCommandWorker : ReceiveActor
+public class StartCommandWorker : CommandWorker
 {
-    public StartCommandWorker(ILogger<StartCommandWorker> logger)
+    public StartCommandWorker(BotUser user, ILogger<StartCommandWorker> logger) : base(user, logger)
     {
-        ReceiveAny(msg =>
-        {
-            logger.LogDebug("Hello from the start worker!");
-        });
+    }
+    
+    protected override void ProcessCommand(IList<string> args, ChatInformation chatInfo)
+    {
+        _logger.LogDebug("Command [{User}]", User.GetNameString());
     }
 }

@@ -10,6 +10,7 @@ public class BotUser
     public List<string> Roles { get; init; } = new ();
     
     public bool IsEnabled { get; set; }
+    public bool IsBanned { get; set; }
 
     public string GetNameString() => string.Join(" ", FirstName, LastName);
 }

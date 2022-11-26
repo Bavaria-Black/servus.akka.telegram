@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Servus.Akka.Telegram.Services;
 
 namespace Servus.Akka.Telegram.Hosting;
@@ -9,4 +10,7 @@ public static class HostingExtensions
     {
         return serviceCollection.AddHostedService<MessageUpdateService>();
     }
+    
+    public static T GetConfiguration<T>(this IServiceProvider sp) where T : class, new()
+        => sp.GetRequiredService<IOptions<T>>().Value;
 }

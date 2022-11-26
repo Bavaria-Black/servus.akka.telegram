@@ -15,13 +15,13 @@ public class CommandRegistry : IExtension
         _adminRole = adminRole;
     }
 
-    public void RegisterCommand(string commandName, int paramCount, bool joinParams, string requiredRole, Props props)
+    public void RegisterCommand(string commandName, int paramCount, bool joinParams, string requiredRole, Func<BotUser, Props> propsFactory)
     {
-        var command = new CommandRegistration(commandName, paramCount, joinParams, requiredRole, _adminRole, props);
+        var command = new CommandRegistration(commandName, paramCount, joinParams, requiredRole, _adminRole, propsFactory);
         _commands.Add(command);
     }
 
-    internal bool CheckAndExecute(TelegramCommand msg, BotUser? user, Action<Props, string> action)
+    internal bool CheckAndExecute(TelegramCommand msg, BotUser user, Action<Props, string> action)
         => _commands.Any(command => command.CheckAndRun(msg, user, action));
     
     public static CommandRegistry For(ActorSystem actorSystem)
