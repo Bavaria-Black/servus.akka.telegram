@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Servus.Akka.Telegram.TestBot", "Servus.Akka.Telegram.TestBot\Servus.Akka.Telegram.TestBot.csproj", "{E1550358-C33D-4896-9B1C-A796177A2089}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Servus.Akka.Telegram", "Servus.Akka.Telegram\Servus.Akka.Telegram.csproj", "{5ADCEC82-2C49-43E4-B886-526C118D220E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFiles", "SolutionFiles", "{54F0285B-73A2-4D9F-B5F7-F0C8E9C8C98F}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E1550358-C33D-4896-9B1C-A796177A2089}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1550358-C33D-4896-9B1C-A796177A2089}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1550358-C33D-4896-9B1C-A796177A2089}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1550358-C33D-4896-9B1C-A796177A2089}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5ADCEC82-2C49-43E4-B886-526C118D220E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5ADCEC82-2C49-43E4-B886-526C118D220E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5ADCEC82-2C49-43E4-B886-526C118D220E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5ADCEC82-2C49-43E4-B886-526C118D220E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
