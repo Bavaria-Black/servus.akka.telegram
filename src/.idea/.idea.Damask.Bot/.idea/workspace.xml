@@ -36,20 +36,28 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/ce2f0143afe44f50aa62466e2d7a75cc66fb0/59/c5d0cbd1/IGrouping`2.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/29fc3b9c689d1ccd4f909907c82d8b13351f7fed0d6d59d3f2214ca391610ad/AkkaClusterHostingExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2e7cbc5cf17c29c613613d0a6aef75a55838879c28688b51a8f9c3ec748d3ef/Mailbox.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/34ba1c7b528682a665df1c7f4bfbfe6836770557f9bda517e2c2d8b9c5a6d/ActorRegistry.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/43815673d8beddef74171661710919323559088782810e345bf74e87261babc/UntypedActor.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/43a0d9a27c7d3e9ddaabb62fd31c1e1eb74d4ee26daf274376dcd22da8a92/DependencyResolver.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/4e54ef9f69db83765899556c8b289c029e99b62448391fe245fefc0bb8c637e/Extensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/575c31ecc35a636b6f962cb71d53992552941a18982aae1c8e6c16305cc3761b/ExceptionDispatchInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/5e9820b6cf119c9499c8c51a363c2cebcd9c8a0d711f3fbb1597cdc26a188bf/User.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/6d200f4480cfa0a2e51ff610b06e88f320c54dbc152a333dc09c7f848ea5a2/Operators.vb" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/7d7c792bdad961b744b9a95ce83cf51d344ce107198102362ce9856d954a2bd/Message.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/8271807a61bb8a8540cf6d7a38534480374a4aac934ee4f53d7efdc9aea37ae/IOptions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/969cc68a19b851dbd1c752f325bdd20359c55478c769fbdaa78b42d99b2c/BsonClassMapSerializer.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/97a75c1bb16bdc9c561458a7c83b548704a3ff4b1ffad40f3fb109955d17f7/ExtendedActorSystem.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/998134871217ec92cc3dd21a9d3241ca22a982c2b582818fd83fe4987763380/IAggregateFluentExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/9ee59120f49393f682ff4b3720f34e85dcdb08427f9985e4b50ebeb7b86e/ActorBase.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/9f767e21278d1f8bb80d0dbc741183445da55871aa0ada1a9240f881ffa263/AkkaConfigurationBuilder.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/a2f62c8c1cbf17252a2bbef24dca1d379bbbbfe57eeb51c5c8ef1d2978cc/BotCommand.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/a4af3fabc41ff23138d52fdccc851da7f4f67136fe81cdb2c1d4a448e785147/IMongoCollectionExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/a819e826a31ade8f68e05faae410e43d5fe889ecc3e23d30d2d5536c8e76d14/ActorCell.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/b5bd1148282539c831b1c6851f7a43f64d4625f3fbebc31c3c08294d699f/ActorSystem.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d6b4aefcd8a1389eac53f90b24090dea8ea6b3b6c8594585fbd790a8651ebd/Update.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/e0bea4e5f03899efe75dc4dcf582f230702687c5ac6269866345ce4aae5d8a36/ServiceProviderServiceExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/e43ba7e1c2ca3d90c99c253bf5aa6fe9daad975ee45a75d1858a6bc0d2e3acb/ClusterSharding.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f598471a624ca5a0b6cd4960d1aeb0ce37b602482b7cee37a7cd6d9c14473/AkkaHostingExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/fa3ea3440b85ae99643e64f0b1c2bcc49bb1404445c18a939dda1ded1b74/ReceiveActor.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Servus.Akka.Telegram.TestBot/Program.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
@@ -136,7 +144,7 @@
       <workItem from="1666373067332" duration="1237000" />
       <workItem from="1668458494787" duration="2725000" />
       <workItem from="1669458901314" duration="2095000" />
-      <workItem from="1669463389864" duration="4303000" />
+      <workItem from="1669463389864" duration="11215000" />
     </task>
     <servers />
   </component>

@@ -1,8 +1,11 @@
 using Akka.Actor;
+using Akka.Hosting;
+using Akka.IO;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Servus.Akka.Telegram.Messages;
 using Servus.Akka.Telegram.Users;
+using Telegram.Bot.Types;
 
 namespace Servus.Akka.Telegram.Services;
 
@@ -13,6 +16,7 @@ public class UserShardRegion : ReceiveActor
     private readonly IServiceScope _scope;
     private readonly IBotUserRepository _userRepository;
     private BotUser _user = new();
+    private CommandRegistry _commandRegistry;
 
     public UserShardRegion(long userId, IServiceProvider sp, ILogger<UserShardRegion> logger)
     {
@@ -24,10 +28,18 @@ public class UserShardRegion : ReceiveActor
     }
     protected override void PreStart()
     {
+        _commandRegistry = CommandRegistry.For(Context.System);
         _userRepository.GetBotUser(_userId).Some(u =>
         { 
             _user = u;
-            Become(Ready);    
+            if (_user.IsEnabled)
+            {
+                Become(Ready);
+            }
+            else
+            {
+                Become(Disabled);
+            }
         }).None(() => Become(NewUser));
 
         _userRepository.GetBotUser(_userId);
@@ -36,10 +48,36 @@ public class UserShardRegion : ReceiveActor
     private void Ready()
     {
         _logger.LogDebug("BECOME ready for user [{UserId}] [{UserName}]", _userId, _user.GetNameString());
+
+        Receive<TelegramCommand>(msg =>
+        {
+            _logger.LogDebug("Known user received message of type {TypeName}", msg.GetType().Name);
+            _commandRegistry.CheckAndExecute(msg, _user, (props, safeCommandName) =>
+            {
+                var worker = Context.Child(safeCommandName);
+                if (worker.IsNobody())
+                {
+                    _logger.LogDebug("Creating new worker [{WorkerType}] for command [{TelegramCommand}] with [{ArgumentCount}] arguments", props.TypeName, msg.Command, msg.Parameters.Count);
+                    worker = Context.ActorOf(props, safeCommandName);
+                }
+                
+                worker.Tell(msg);
+            });
+        });
         
         ReceiveAny(msg =>
         {
-            _logger.LogDebug("Known user received message of type {TypeName}", msg.GetType().Name);            
+            _logger.LogDebug("Known user received unhandled message of type {TypeName}", msg.GetType().Name);    
+        });   
+    }
+
+    private void Disabled()
+    {
+        _logger.LogDebug("BECOME disabled for user [{UserId}] [{UserName}]", _userId, _user.GetNameString());
+        
+        ReceiveAny(msg =>
+        {
+            _logger.LogWarning("User [{UserId}] [{UserName}] is currently disabled. All messaged being dropped!", _userId, _user.GetNameString());            
         });   
     }
 

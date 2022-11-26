@@ -2,6 +2,7 @@
 using Akka.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Servus.Akka.Telegram.Messages;
+using Servus.Akka.Telegram.Services;
 using Servus.Akka.Telegram.Users;
 
 namespace Servus.Akka.Telegram;
@@ -9,24 +10,21 @@ namespace Servus.Akka.Telegram;
 public class TelegramIngress : ReceiveActor
 {
     private readonly IServiceScope _scope;
-    private readonly CommandRegistry _commandRegistry;
 
     public TelegramIngress(IServiceProvider sp)
     {
         _scope = sp.CreateScope();
         var userRepository = _scope.ServiceProvider.GetRequiredService<IBotUserRepository>();
-        _commandRegistry = new CommandRegistry();
+        var registry = _scope.ServiceProvider.GetRequiredService<IActorRegistry>();
+        
+        var userRegion = registry.Get<UserShardRegion>();
 
         Receive<TelegramCommand>(msg =>
         {
             var user = userRepository.GetBotUser(msg.UserId);
             user.Some(u =>
             {
-                if (!_commandRegistry.CheckAndExecute(msg, u))
-                {
-                    ReplyText(msg.UserId,
-                        $"Your command: {msg.Command} {string.Join(' ', msg.Parameters)}, can't be execute right now. Maybe you typed something wrong?");
-                }
+                userRegion.Forward(msg);
             }).None(() =>
             {
 
@@ -38,10 +36,6 @@ public class TelegramIngress : ReceiveActor
             });
         });
     }
-
-    protected void RegisterCommand(string commandName, int paramCount, bool joinParams, string requiredRole,
-        Action<TelegramCommand, BotUser?> action)
-        => _commandRegistry.RegisterCommand(commandName, paramCount, joinParams, requiredRole, action);
 
     protected void ReplyText(BotUser user, string text)
         => ReplyText(user.Id, text);

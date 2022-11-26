@@ -1,3 +1,4 @@
+using Akka.Actor;
 using Akka.Util.Internal;
 using Servus.Akka.Telegram.Messages;
 using Servus.Akka.Telegram.Users;
@@ -11,20 +12,26 @@ internal class CommandRegistration
     private readonly bool _joinParams;
     private readonly string _requiredRole;
     private readonly string _adminRole;
-    private readonly Action<TelegramCommand, BotUser?> _action;
+    private readonly Props _props;
 
     public CommandRegistration(string commandName, int paramCount, bool joinParams, string requiredRole,
-        string adminRole, Action<TelegramCommand, BotUser?> action)
+        string adminRole, Props props)
     {
+        if (!commandName.StartsWith("/"))
+        {
+            
+            commandName = $"/{commandName}";
+        }
+        
         _commandName = commandName;
         _paramCount = paramCount;
         _joinParams = joinParams;
         _requiredRole = requiredRole;
         _adminRole = adminRole;
-        _action = action;
+        _props = props;
     }
 
-    public bool CheckAndRun(TelegramCommand command, BotUser? user)
+    internal bool CheckAndRun(TelegramCommand command, BotUser? user, Action<Props, string> action)
     {
         if (_joinParams && _paramCount == 1)
             command = command with
@@ -43,7 +50,7 @@ internal class CommandRegistration
              || command.Parameters.Count != _paramCount)
             return false;
 
-        _action(command, user);
+        action(_props, _commandName[1..]);
         return true;
     }
 }

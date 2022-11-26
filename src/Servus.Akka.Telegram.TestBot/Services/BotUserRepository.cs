@@ -37,6 +37,7 @@ public class BotUserRepository : IBotUserRepository
             Roles = new List<string>(roles),
             FirstName = firstName,
             LastName = lastName,
+            NickName = username,
             IsEnabled = isEnabled
         };
         

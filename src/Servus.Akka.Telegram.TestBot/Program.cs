@@ -20,6 +20,7 @@ using Servus.Akka.Telegram.Hosting.Configuration;
 using Servus.Akka.Telegram.Messages;
 using Servus.Akka.Telegram.Services;
 using Servus.Akka.Telegram.TestBot;
+using Servus.Akka.Telegram.TestBot.MessageProcessing;
 using Servus.Akka.Telegram.TestBot.Services;
 using Servus.Akka.Telegram.Users;
 using Telegram.Bot;
@@ -111,7 +112,7 @@ var host = Host.CreateDefaultBuilder(args)
                         {
                             Role = "user-shard"
                         }
-                    );
+                    ).WithCommandWorker<StartCommandWorker>("/start", 0, false, string.Empty);
             })
             .AddScoped<IBotUserRepository, BotUserRepository>()
             .AddScoped(s =>
