@@ -14,6 +14,17 @@ public class StartCommandWorker : CommandWorker
     
     protected override void ProcessCommand(IList<string> args, ChatInformation chatInfo)
     {
-        _logger.LogDebug("Command [{User}]", User.GetNameString());
+        switch (args.Count)
+        {
+            case 0:
+                _logger.LogDebug("New user [{User}] joined", User.GetNameString());
+                break;
+            case 1:
+                _logger.LogDebug("New user [{User}] joined via invite", User.GetNameString());
+                break;
+            default:
+                _logger.LogWarning("New user [{User}] joined but i don't know how....", User.GetNameString());
+                break;
+        }
     }
 }

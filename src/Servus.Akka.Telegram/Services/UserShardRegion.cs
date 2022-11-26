@@ -17,15 +17,20 @@ public class UserShardRegion : ReceiveActor
     private readonly IBotUserRepository _userRepository;
     private BotUser _user = new();
     private readonly CommandRegistry _commandRegistry;
+    private readonly IActorRef _egress;
 
     public UserShardRegion(long userId, IServiceProvider sp, ILogger<UserShardRegion> logger)
     {
+        logger.LogDebug("Staring up new shard entity for user {UserId}", userId);
+
         _userId = userId;
         _logger = logger;
         _scope = sp.CreateScope();
         _userRepository = _scope.ServiceProvider.GetRequiredService<IBotUserRepository>();
-        _logger.LogDebug("Staring up new shard entity for user {UserId}", userId);
-        _commandRegistry = CommandRegistry.For(Context.System);  
+        _commandRegistry = CommandRegistry.For(Context.System);
+        
+        var registry = _scope.ServiceProvider.GetRequiredService<IActorRegistry>();
+        _egress = registry.Get<TelegramEgress>();
     }
     protected override void PreStart()
     {
@@ -52,7 +57,7 @@ public class UserShardRegion : ReceiveActor
         Receive<TelegramCommand>(msg =>
         {
             _logger.LogDebug("Known user received message of type {TypeName}", msg.GetType().Name);
-            _commandRegistry.CheckAndExecute(msg, _user, (props, safeCommandName) =>
+            var executed = _commandRegistry.CheckAndExecute(msg, _user, (props, safeCommandName) =>
             {
                 var worker = Context.Child(safeCommandName);
                 if (worker.IsNobody())
@@ -63,6 +68,11 @@ public class UserShardRegion : ReceiveActor
                 
                 worker.Tell(new CommandMessage(msg.ChatInformation, msg.Parameters));
             });
+
+            if (!executed)
+            {
+                _egress.Tell(new SendTextMessage(msg.UserId, "Unrecognized command. Say what?"));
+            }
         });
         
         ReceiveAny(msg =>

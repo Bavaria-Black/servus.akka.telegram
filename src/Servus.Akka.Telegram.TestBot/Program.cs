@@ -76,35 +76,16 @@ var host = Host.CreateDefaultBuilder(args)
                         setup.AddLoggerFactory();
                         setup.AddLogger<SerilogLogger>();
                     })
-                    .WithRemoting("localhost", 8110)
-                    .WithClustering(new ClusterOptions()
-                    {
-                        Roles = new[] {"myRole", "user-shard"},
-                        SeedNodes = new[] {Address.Parse("akka.tcp://Damask@localhost:8110")}
-                    })
-                    .AddHocon("auto-down-unreachable-after")
-                    .WithActors((system, registry) =>
-                    {
-                        registry.TryRegisterDiActor<TelegramIngress>(system, "telegram-ingress");
-                        registry.TryRegisterDiActor<TelegramEgress>(system, "telegram-egress");
-                    }).WithShardRegion<UserShardRegion>(
-                        typeName: "user-region",
-                        compositePropsFactory: (system, registry) =>
-                        {
-                            return (e) => DependencyResolver.For(system).Props<UserShardRegion>(long.Parse(e));
-                        },
-                        new UserMessageExtractor(5),
-                        new ShardOptions()
-                        {
-                            Role = "user-shard"
-                        }
-                    ).WithCommandWorker<StartCommandWorker>("/start", 1, false, string.Empty);
+                    .AddTelegramCluster("localhost", 8110, new[] {"akka.tcp://Damask@localhost:8110"})
+                    //.AddHocon("auto-down-unreachable-after")
+                    .WithCommandWorker<StartCommandWorker>("/start")
+                    .WithCommandWorker<StartCommandWorker>("/start", 1);
             })
             .AddScoped<IBotUserRepository, BotUserRepository>()
             .AddScoped(s =>
             {
-                var options = s.GetRequiredService<IOptions<MongoConfiguration>>();
-                return new MongoClient(options.Value.GetConnectionString());
+                var options = s.GetConfiguration<MongoConfiguration>();
+                return new MongoClient(options.GetConnectionString());
             })
             .AddScoped(s => s.GetRequiredService<MongoClient>().GetDatabase("damask"))
             .AddScoped(s => s.GetRequiredService<IMongoDatabase>().GetCollection<BotUser>("botuser"));

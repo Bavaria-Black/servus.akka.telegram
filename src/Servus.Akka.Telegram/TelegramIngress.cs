@@ -25,6 +25,11 @@ public class TelegramIngress : ReceiveActor
         
         var userRegion = registry.Get<UserShardRegion>();
 
+        Receive<TelegramText>(msg =>
+        {
+            ReplyText(msg.UserId, $"Sorry I only understand commands for now...");
+        });
+        
         Receive<TelegramCommand>(msg =>
         {
             var user = userRepository.GetBotUser(msg.UserId);

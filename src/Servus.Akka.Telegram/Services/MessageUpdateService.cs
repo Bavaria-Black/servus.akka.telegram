@@ -83,9 +83,10 @@ public class MessageUpdateService : IHostedService
                 from.Username ?? string.Empty);
 
         var chatId = message.Chat.Id;
+        var ingress = _registry.Get<TelegramIngress>();
+        
         if (message.Entities?.Length > 0)
         {
-            var actor = _registry.Get<TelegramIngress>();
             for (var i = 0; i < message.Entities.Length; i++)
             {
                 var entity = message.Entities[i];
@@ -108,8 +109,12 @@ public class MessageUpdateService : IHostedService
                 parameter = parameter.Where(x => !string.IsNullOrEmpty(x)).ToArray();
                 _logger.LogDebug("Received a [{EntityType}] from {ChatId}: [{Command}] [{CommandParameter}]",
                     entity.Type, update.Message.Chat.Id, command, parameter);
-                actor.Tell(new TelegramCommand(chatId, message.MessageId, messageText, command, parameter, chatInfo));
+                ingress.Tell(new TelegramCommand(chatId, message.MessageId, messageText, command, parameter, chatInfo));
             }
+        }
+        else if(message.Type == MessageType.Text)
+        {
+            ingress.Tell(new TelegramText(chatId, message.MessageId, message.Text, chatInfo));
         }
 
         return Task.CompletedTask;
