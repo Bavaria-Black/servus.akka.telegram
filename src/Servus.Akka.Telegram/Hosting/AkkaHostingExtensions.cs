@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using Akka.Actor;
 using Akka.Cluster.Hosting;
 using Akka.DependencyInjection;
@@ -29,6 +30,7 @@ public static class AkkaHostingExtensions
                 SeedNodes = seedNodes.Select(Address.Parse).ToArray()
             }).WithActors((system, registry) =>
             {
+                registry.TryRegisterDiActor<InvitationController>(system, "invitation-controller");
                 registry.TryRegisterDiActor<TelegramIngress>(system, "telegram-ingress");
                 registry.TryRegisterDiActor<TelegramEgress>(system, "telegram-egress");
             })
@@ -46,7 +48,13 @@ public static class AkkaHostingExtensions
     public static AkkaConfigurationBuilder WithCommandWorker<T>(this AkkaConfigurationBuilder builder,
         string commandName, int paramCount = 0, bool joinParams = false, string requiredRole = "") where T : ActorBase
     {
-        return builder.WithActors((system, registry) =>
+        if (paramCount == 1 && commandName is "/start" or "start")
+        {
+            throw new ArgumentException("it is not possible to register the /start command with more than 0 params",
+                nameof(paramCount));
+        }
+
+        return builder.WithActors((system, _) =>
         {
             var commandRegistry = CommandRegistry.For(system);
             commandRegistry.RegisterCommand(commandName, paramCount, joinParams, requiredRole,

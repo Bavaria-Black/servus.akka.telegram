@@ -1,14 +1,13 @@
-using Akka.Actor;
+using Akka.Hosting;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver.Core.WireProtocol.Messages;
 using Servus.Akka.Telegram.Messages;
 using Servus.Akka.Telegram.Users;
 
-namespace Servus.Akka.Telegram.TestBot.MessageProcessing;
+namespace Servus.Akka.Telegram.TestBot.CommandWorker;
 
-public class StartCommandWorker : CommandWorker
+public class StartCommandWorker : Telegram.CommandWorker
 {
-    public StartCommandWorker(BotUser user, ILogger<StartCommandWorker> logger) : base(user, logger)
+    public StartCommandWorker(BotUser user, ActorRegistry registry, ILogger<StartCommandWorker> logger) : base(user, registry, logger)
     {
     }
     

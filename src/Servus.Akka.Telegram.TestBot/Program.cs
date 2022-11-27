@@ -20,7 +20,8 @@ using Servus.Akka.Telegram.Hosting.Configuration;
 using Servus.Akka.Telegram.Messages;
 using Servus.Akka.Telegram.Services;
 using Servus.Akka.Telegram.TestBot;
-using Servus.Akka.Telegram.TestBot.MessageProcessing;
+using Servus.Akka.Telegram.TestBot.CommandWorker;
+using Servus.Akka.Telegram.TestBot.Repos;
 using Servus.Akka.Telegram.TestBot.Services;
 using Servus.Akka.Telegram.Users;
 using Telegram.Bot;
@@ -76,19 +77,26 @@ var host = Host.CreateDefaultBuilder(args)
                         setup.AddLoggerFactory();
                         setup.AddLogger<SerilogLogger>();
                     })
-                    .AddTelegramCluster("localhost", 8110, new[] {"akka.tcp://Damask@localhost:8110"})
+                    .AddTelegramCluster("localhost", 8110, new[] {"akka.tcp://Damask@localhost:8110"}, "test")
                     //.AddHocon("auto-down-unreachable-after")
+                    .WithActors((system, registry) =>
+                    {
+                        var actor = system.ResolveActor<InviteActivator>("test-invite-activator");
+                        registry.Register<InviteActivator>(actor);
+                    })
                     .WithCommandWorker<StartCommandWorker>("/start")
-                    .WithCommandWorker<StartCommandWorker>("/start", 1);
+                    .WithCommandWorker<InviteCreationWorker>("/test");
             })
             .AddScoped<IBotUserRepository, BotUserRepository>()
+            .AddScoped<IInviteRepository, InviteRepository>()
             .AddScoped(s =>
             {
                 var options = s.GetConfiguration<MongoConfiguration>();
                 return new MongoClient(options.GetConnectionString());
             })
             .AddScoped(s => s.GetRequiredService<MongoClient>().GetDatabase("damask"))
-            .AddScoped(s => s.GetRequiredService<IMongoDatabase>().GetCollection<BotUser>("botuser"));
+            .AddScoped(s => s.GetRequiredService<IMongoDatabase>().GetCollection<BotUser>("botuser"))
+            .AddScoped(s => s.GetRequiredService<IMongoDatabase>().GetCollection<Invitation>("invites"));
     })
     .UseSerilog()
     .Build();

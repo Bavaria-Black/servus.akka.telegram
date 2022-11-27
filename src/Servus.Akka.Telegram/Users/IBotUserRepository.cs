@@ -15,6 +15,9 @@ public interface IBotUserRepository
     bool HasRole(BotUser user, string role)
         => user.Roles.Contains(role);
 
+    void AddRoles(BotUser user, params string[] roles) => AddRoles(user.Id, roles);
+    void AddRoles(long id, params string[] roles);
+    
     void AddRole(BotUser user, string role) => AddRole(user.Id, role);
     void AddRole(long id, string role);
 

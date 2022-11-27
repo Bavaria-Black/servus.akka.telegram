@@ -2,7 +2,7 @@ using LanguageExt;
 using MongoDB.Driver;
 using Servus.Akka.Telegram.Users;
 
-namespace Servus.Akka.Telegram.TestBot.Services;
+namespace Servus.Akka.Telegram.TestBot.Repos;
 
 public class BotUserRepository : IBotUserRepository
 {
@@ -12,20 +12,32 @@ public class BotUserRepository : IBotUserRepository
     {
         _collection = collection;
     }
-    
+
     public Option<BotUser> GetBotUser(long id)
     {
         return _collection.Find(f => f.Id == id).ToList().FirstOrDefault();
     }
 
+    public void AddRoles(long id, params string[] roles)
+    {
+        GetBotUser(id).Some(user =>
+        {
+            var newRoles = user.Roles.Union(roles).ToList();
+            user.Roles.Clear();
+            user.Roles.AddRange(newRoles);
+            _collection.UpdateOne(f => f.Id == user.Id,
+                Builders<BotUser>.Update.Set(f => f.Roles, user.Roles));
+        }).None(() => { });
+    }
+
     public void AddRole(long id, string role)
     {
-        _ = GetBotUser(id).Some(user =>
+        GetBotUser(id).Some(user =>
         {
             user.Roles.Add(role);
             _collection.UpdateOne(f => f.Id == user.Id,
                 Builders<BotUser>.Update.Set(f => f.Roles, user.Roles));
-        });
+        }).None(() => { });
     }
 
     public BotUser AddUser(long id, string firstName, string lastName, string username = "", bool isEnabled = true,
@@ -40,7 +52,7 @@ public class BotUserRepository : IBotUserRepository
             NickName = username,
             IsEnabled = isEnabled
         };
-        
+
         _collection.InsertOne(user);
 
         return user;
