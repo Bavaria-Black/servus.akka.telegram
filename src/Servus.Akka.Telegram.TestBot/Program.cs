@@ -85,10 +85,11 @@ var host = Host.CreateDefaultBuilder(args)
                         registry.Register<InviteActivator>(actor);
                     })
                     .WithCommandWorker<StartCommandWorker>("/start")
-                    .WithCommandWorker<InviteCreationWorker>("/test");
+                    .WithCommandWorker<InviteCreationWorker>("/createInvite", 1);
             })
             .AddScoped<IBotUserRepository, BotUserRepository>()
             .AddScoped<IInviteRepository, InviteRepository>()
+            .AddScoped<TestInviteExtensionRepository>()
             .AddScoped(s =>
             {
                 var options = s.GetConfiguration<MongoConfiguration>();
@@ -96,7 +97,8 @@ var host = Host.CreateDefaultBuilder(args)
             })
             .AddScoped(s => s.GetRequiredService<MongoClient>().GetDatabase("damask"))
             .AddScoped(s => s.GetRequiredService<IMongoDatabase>().GetCollection<BotUser>("botuser"))
-            .AddScoped(s => s.GetRequiredService<IMongoDatabase>().GetCollection<Invitation>("invites"));
+            .AddScoped(s => s.GetRequiredService<IMongoDatabase>().GetCollection<Invitation>("invites"))
+            .AddScoped(s => s.GetRequiredService<IMongoDatabase>().GetCollection<TestInviteExtension>("invite-extension"));
     })
     .UseSerilog()
     .Build();

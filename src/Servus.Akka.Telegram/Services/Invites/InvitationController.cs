@@ -24,7 +24,7 @@ public class InvitationController : ReceiveActor
             inviteRepo.InsertInvitation(code, msg.ValidUntil, msg.Role, msg.ActorName, msg.FirstName, msg.LastName,
                 msg.UserRoles);
             
-            Sender.Tell(new CreateNewInvitationResponse(string.Join("/", config.BotLink, $"?start={code}")));
+            Sender.Tell(new CreateNewInvitationResponse(string.Join("/", config.BotLink, $"?start={code}"), code));
         });
     }
 
