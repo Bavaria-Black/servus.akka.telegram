@@ -87,7 +87,7 @@ var host = Host.CreateDefaultBuilder(args)
                     .WithCommandWorker<InviteCreationWorker>("admin", builder => { builder.AddCommand("/test", 1); })
                     .WithCommandWorker<StartStopCommandWorker>("test", builder =>
                     {
-                        builder.AddCommand("/begin").AddCommand("end");
+                        builder.AddCommand("/begin").AddCommand("end").AddCommand("time");
                     });
             })
             .AddScoped<IBotUserRepository, BotUserRepository>()

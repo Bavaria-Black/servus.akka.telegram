@@ -1,3 +1,3 @@
 namespace Servus.Akka.Telegram.Messages;
 
-public record CommandMessage(ChatInformation ChatInformation, IList<string> Arguments);
+internal record CommandMessage(string Command, ChatInformation ChatInformation, IList<string> Arguments);

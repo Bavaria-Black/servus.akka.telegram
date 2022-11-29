@@ -9,9 +9,10 @@ public class StartCommandWorker : Telegram.CommandWorker
 {
     public StartCommandWorker(BotUser user, ActorRegistry registry, ILogger<StartCommandWorker> logger) : base(user, registry, logger)
     {
+        RegisterCommand("/start", ProcessCommand);
     }
     
-    protected override void ProcessCommand(IList<string> args, ChatInformation chatInfo)
+    private void ProcessCommand(IList<string> args, ChatInformation chatInfo)
     {
         switch (args.Count)
         {

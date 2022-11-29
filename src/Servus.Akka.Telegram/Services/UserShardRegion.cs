@@ -68,7 +68,7 @@ public class UserShardRegion : ReceiveActor
                     worker = Context.ActorOf(prop, workerId);
                 }
                 
-                worker.Tell(new CommandMessage(msg.ChatInformation, msg.Parameters));
+                worker.Tell(new CommandMessage(msg.Command, msg.ChatInformation, msg.Parameters));
             });
 
             if (!executed)

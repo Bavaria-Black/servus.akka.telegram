@@ -30,9 +30,11 @@ public class InviteCreationWorker : Telegram.CommandWorker
             // extend the invite with additional information needed for activation
             _repository.Insert(msg.Code, _inviteParameter);
         });
+        
+        RegisterCommand("/test", ProcessCommand);
     }
 
-    protected override void ProcessCommand(IList<string> args, ChatInformation chatInfo)
+    private void ProcessCommand(IList<string> args, ChatInformation chatInfo)
     {
         if (int.TryParse(args.First(), out _inviteParameter))
         {
