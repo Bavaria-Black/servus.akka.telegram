@@ -84,8 +84,11 @@ var host = Host.CreateDefaultBuilder(args)
                         var actor = system.ResolveActor<InviteActivator>("test-invite-activator");
                         registry.Register<InviteActivator>(actor);
                     })
-                    .WithCommandWorker<StartCommandWorker>("/start")
-                    .WithCommandWorker<InviteCreationWorker>("/createInvite", 1);
+                    .WithCommandWorker<InviteCreationWorker>("admin", builder => { builder.AddCommand("/test", 1); })
+                    .WithCommandWorker<StartStopCommandWorker>("test", builder =>
+                    {
+                        builder.AddCommand("/begin").AddCommand("end");
+                    });
             })
             .AddScoped<IBotUserRepository, BotUserRepository>()
             .AddScoped<IInviteRepository, InviteRepository>()
@@ -98,7 +101,8 @@ var host = Host.CreateDefaultBuilder(args)
             .AddScoped(s => s.GetRequiredService<MongoClient>().GetDatabase("damask"))
             .AddScoped(s => s.GetRequiredService<IMongoDatabase>().GetCollection<BotUser>("botuser"))
             .AddScoped(s => s.GetRequiredService<IMongoDatabase>().GetCollection<Invitation>("invites"))
-            .AddScoped(s => s.GetRequiredService<IMongoDatabase>().GetCollection<TestInviteExtension>("invite-extension"));
+            .AddScoped(s =>
+                s.GetRequiredService<IMongoDatabase>().GetCollection<TestInviteExtension>("invite-extension"));
     })
     .UseSerilog()
     .Build();

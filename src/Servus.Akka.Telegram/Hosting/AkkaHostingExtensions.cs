@@ -5,7 +5,9 @@ using Akka.DependencyInjection;
 using Akka.Hosting;
 using Akka.Remote.Hosting;
 using Servus.Akka.Telegram.Messages;
+using Servus.Akka.Telegram.Registry;
 using Servus.Akka.Telegram.Services;
+using Servus.Akka.Telegram.Users;
 
 namespace Servus.Akka.Telegram.Hosting;
 
@@ -45,20 +47,19 @@ public static class AkkaHostingExtensions
             );
     }
 
-    public static AkkaConfigurationBuilder WithCommandWorker<T>(this AkkaConfigurationBuilder builder,
-        string commandName, int paramCount = 0, bool joinParams = false, string requiredRole = "") where T : ActorBase
+    public static AkkaConfigurationBuilder WithCommandWorker<T>(this AkkaConfigurationBuilder configurationBuilder,
+        string requiredRole, Action<CommandListBuilder> builder) where T : ActorBase
     {
-        if (paramCount == 1 && commandName is "/start" or "start")
+        return configurationBuilder.WithActors((system, _) =>
         {
-            throw new ArgumentException("it is not possible to register the /start command with more than 0 params",
-                nameof(paramCount));
-        }
+            Props PropsFactory(BotUser user) => DependencyResolver.For(system).Props<T>(user);
 
-        return builder.WithActors((system, _) =>
-        {
-            var commandRegistry = CommandRegistry.For(system);
-            commandRegistry.RegisterCommand(commandName, paramCount, joinParams, requiredRole,
-                (user) => DependencyResolver.For(system).Props<T>(user));
+            var workerRegistry = WorkerRegistry.For(system);
+            var commandListBuilder = new CommandListBuilder(requiredRole, PropsFactory);
+            
+            builder(commandListBuilder);
+            
+            workerRegistry.Register(commandListBuilder.Build());
         });
     }
 }

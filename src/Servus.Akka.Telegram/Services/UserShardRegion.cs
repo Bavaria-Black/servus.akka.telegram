@@ -4,6 +4,7 @@ using Akka.IO;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Servus.Akka.Telegram.Messages;
+using Servus.Akka.Telegram.Registry;
 using Servus.Akka.Telegram.Users;
 using Telegram.Bot.Types;
 
@@ -16,7 +17,7 @@ public class UserShardRegion : ReceiveActor
     private readonly IServiceScope _scope;
     private readonly IBotUserRepository _userRepository;
     private BotUser _user = new();
-    private readonly CommandRegistry _commandRegistry;
+    private readonly WorkerRegistry _commandRegistry;
     private readonly IActorRef _egress;
 
     public UserShardRegion(long userId, IServiceProvider sp, ILogger<UserShardRegion> logger)
@@ -27,7 +28,7 @@ public class UserShardRegion : ReceiveActor
         _logger = logger;
         _scope = sp.CreateScope();
         _userRepository = _scope.ServiceProvider.GetRequiredService<IBotUserRepository>();
-        _commandRegistry = CommandRegistry.For(Context.System);
+        _commandRegistry = WorkerRegistry.For(Context.System);
         
         var registry = _scope.ServiceProvider.GetRequiredService<IActorRegistry>();
         _egress = registry.Get<TelegramEgress>();
@@ -57,13 +58,14 @@ public class UserShardRegion : ReceiveActor
         Receive<TelegramCommand>(msg =>
         {
             _logger.LogDebug("Known user received message of type {TypeName}", msg.GetType().Name);
-            var executed = _commandRegistry.CheckAndExecute(msg, _user, (props, safeCommandName) =>
+            var executed = _commandRegistry.CheckAndExecute(msg, _user, (propFac, workerId) =>
             {
-                var worker = Context.Child(safeCommandName);
+                var worker = Context.Child(workerId);
                 if (worker.IsNobody())
                 {
-                    _logger.LogDebug("Creating new worker [{WorkerType}] for command [{TelegramCommand}] with [{ArgumentCount}] arguments", props.TypeName, msg.Command, msg.Parameters.Count);
-                    worker = Context.ActorOf(props, safeCommandName);
+                    var prop = propFac(_user);
+                    _logger.LogDebug("Creating new worker [{WorkerType}] for command [{TelegramCommand}] with [{ArgumentCount}] arguments", prop.TypeName, msg.Command, msg.Parameters.Count);
+                    worker = Context.ActorOf(prop, workerId);
                 }
                 
                 worker.Tell(new CommandMessage(msg.ChatInformation, msg.Parameters));
