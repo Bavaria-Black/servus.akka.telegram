@@ -17,6 +17,9 @@ variables:
 steps:
 - task: NuGetToolInstaller@1
 
+- checkout: self
+  fetchDepth: 0
+
 - task: GitVersion@5
   inputs:
     runtime: 'full'
