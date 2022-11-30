@@ -40,19 +40,22 @@ steps:
     packagesToPack: '**/Servus.Akka.Telegram.csproj'
     versioningScheme: 'byBuildNumber'
 
-- task: CmdLine@2
-  displayName: 'Tag versions in git'
-  # run only for ci builds and ignore PR builds or scheduled builds
-  condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'BatchedCI'))
-  inputs:
-    script: |
-      git tag v$(GitVersion.NugetVersion)
-      git push origin v$(GitVersion.NugetVersion)
-    workingDirectory: '$(Build.SourcesDirectory)'
-
 - task: NuGetCommand@2
+  condition:
   inputs:
     command: 'push'
     packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
     nuGetFeedType: 'external'
     publishFeedCredentials: 'Nuget Servus.Akka.*'
+
+- task: GitHubRelease@1
+  inputs:
+    gitHubConnection: 'Dirnei'
+    repositoryName: 'Bavaria-Black/servus.akka.telegram'
+    action: 'create'
+    target: '$(Build.SourceVersion)'
+    tagSource: 'userSpecifiedTag'
+    tag: '$(GitVersion.NugetVersion)'
+    title: 'Release $(GitVersion.NugetVersion)'
+    changeLogCompareToRelease: 'lastFullRelease'
+    changeLogType: 'commitBased'
