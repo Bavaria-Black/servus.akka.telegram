@@ -1,13 +1,12 @@
 using Akka.Actor;
 using Akka.Hosting;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
 using Servus.Akka.Telegram.Messages;
 using Servus.Akka.Telegram.Services;
 using Servus.Akka.Telegram.TestBot.Repos;
 using Servus.Akka.Telegram.Users;
 
-namespace Servus.Akka.Telegram.TestBot.CommandWorker;
+namespace Servus.Akka.Telegram.TestBot.Worker;
 
 public class InviteCreationWorker : Telegram.CommandWorker
 {

@@ -23,6 +23,7 @@ using Servus.Akka.Telegram.TestBot;
 using Servus.Akka.Telegram.TestBot.CommandWorker;
 using Servus.Akka.Telegram.TestBot.Repos;
 using Servus.Akka.Telegram.TestBot.Services;
+using Servus.Akka.Telegram.TestBot.Worker;
 using Servus.Akka.Telegram.Users;
 using Telegram.Bot;
 
@@ -44,12 +45,6 @@ var host = Host.CreateDefaultBuilder(args)
         var conventionPack = new ConventionPack {new IgnoreExtraElementsConvention(true)};
         ConventionRegistry.Register("IgnoreExtraElements", conventionPack, type => true);
 
-        // Register Bot configuration
-        services.Configure<BotConfiguration>(
-            context.Configuration.GetSection(BotConfiguration.SectionName));
-        // Register Bot configuration
-        services.Configure<UserRegistrationConfiguration>(
-            context.Configuration.GetSection(UserRegistrationConfiguration.SectionName));
         // Register mongo  configuration
         services.Configure<MongoConfiguration>(
             context.Configuration.GetSection(MongoConfiguration.Configuration));
@@ -66,7 +61,7 @@ var host = Host.CreateDefaultBuilder(args)
                 return new TelegramBotClient(botClientOptions, httpClient);
             });
         services
-            .UseTelegramBotService()
+            .UseTelegramBotService(context)
             .AddAkka("Damask", configurationBuilder =>
             {
                 configurationBuilder
@@ -85,6 +80,7 @@ var host = Host.CreateDefaultBuilder(args)
                         registry.Register<InviteActivator>(actor);
                     })
                     .WithCommandWorker<InviteCreationWorker>("admin", builder => { builder.AddCommand("/test", 1); })
+                    .WithCommandWorker<HelloCommandWorker>("admin", builder => { builder.AddCommand("hello"); })
                     .WithCommandWorker<StartStopCommandWorker>("test", builder =>
                     {
                         builder.AddCommand("/begin").AddCommand("end").AddCommand("time");

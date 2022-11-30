@@ -7,6 +7,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFiles", "SolutionFiles", "{54F0285B-73A2-4D9F-B5F7-F0C8E9C8C98F}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		..\azure-pipelines.yml = ..\azure-pipelines.yml
+		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
 Global
