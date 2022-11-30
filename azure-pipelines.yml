@@ -19,7 +19,7 @@ steps:
 
 - task: GitVersion@5
   inputs:
-    runtime: 'core'
+    runtime: 'full'
 
 - task: NuGetCommand@2
   inputs:
