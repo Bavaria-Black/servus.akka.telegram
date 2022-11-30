@@ -40,6 +40,16 @@ steps:
     packagesToPack: '**/Servus.Akka.Telegram.csproj'
     versioningScheme: 'byBuildNumber'
 
+- task: CmdLine@2
+  displayName: 'Tag versions in git'
+  # run only for ci builds and ignore PR builds or scheduled builds
+  condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'BatchedCI'))
+  inputs:
+    script: |
+      git tag v$(GitVersion.NugetVersion)
+      git push origin v$(GitVersion.NugetVersion)
+    workingDirectory: '$(Build.SourcesDirectory)'
+
 - task: NuGetCommand@2
   inputs:
     command: 'push'
