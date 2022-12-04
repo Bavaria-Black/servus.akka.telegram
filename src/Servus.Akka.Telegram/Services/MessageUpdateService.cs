@@ -84,35 +84,28 @@ public class MessageUpdateService : IHostedService
 
         var chatId = message.Chat.Id;
         var ingress = _registry.Get<TelegramIngress>();
-        
+
         if (message.Entities?.Length > 0)
         {
-            for (var i = 0; i < message.Entities.Length; i++)
+            if (message.Entities.First().Type != MessageEntityType.BotCommand)
             {
-                var entity = message.Entities[i];
-                _logger.LogDebug("Offset [{Offset}], Length [{Length}]", entity.Offset, entity.Length);
-                var command = message.Text.Substring(entity.Offset, entity.Length);
-                var parameter = Array.Empty<string>();
-
-                if (i == message.Entities.Length - 1)
-                {
-                    parameter = message.Text.Substring(entity.Offset + entity.Length).Split(' ');
-                }
-                else
-                {
-                    var start = entity.Offset + entity.Length;
-                    parameter = message.Text
-                        .Substring(start, message.Entities[i + 1].Offset - start)
-                        .Split(' ');
-                }
-
-                parameter = parameter.Where(x => !string.IsNullOrEmpty(x)).ToArray();
-                _logger.LogDebug("Received a [{EntityType}] from {ChatId}: [{Command}] [{CommandParameter}]",
-                    entity.Type, update.Message.Chat.Id, command, parameter);
-                ingress.Tell(new TelegramCommand(chatId, message.MessageId, messageText, command, parameter, chatInfo));
+                _logger.LogWarning("Only BotCommands are supported for now. [{Text}] was not handled...", messageText);
+                return Task.CompletedTask;                
             }
+            
+            var commandEntity = message.Entities.First();
+            var command = messageText[commandEntity.Offset..commandEntity.Length];
+            var commandParams = messageText[commandEntity.Length..].Trim().Split(' ');
+
+            if (commandParams.Length == 1 && string.IsNullOrEmpty(commandParams[0]))
+            {
+                commandParams = Array.Empty<string>();
+            }
+            
+            ingress.Tell(new TelegramCommand(chatId, message.MessageId, messageText, command, commandParams,
+                chatInfo));
         }
-        else if(message.Type == MessageType.Text)
+        else if (message.Type == MessageType.Text)
         {
             ingress.Tell(new TelegramText(chatId, message.MessageId, message.Text, chatInfo));
         }

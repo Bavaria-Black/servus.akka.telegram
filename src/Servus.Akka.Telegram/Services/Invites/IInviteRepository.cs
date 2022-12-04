@@ -1,6 +1,6 @@
 using LanguageExt;
 
-namespace Servus.Akka.Telegram.Services;
+namespace Servus.Akka.Telegram.Services.Invites;
 
 public interface IInviteRepository
 {

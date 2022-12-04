@@ -1,17 +1,15 @@
 ﻿using Akka.Actor;
 using Akka.Cluster.Routing;
-using Akka.Configuration;
 using Akka.Hosting;
 using Akka.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualBasic;
 using Servus.Akka.Telegram.Hosting;
 using Servus.Akka.Telegram.Hosting.Configuration;
 using Servus.Akka.Telegram.Messages;
 using Servus.Akka.Telegram.Services;
+using Servus.Akka.Telegram.Services.Invites;
 using Servus.Akka.Telegram.Users;
-using Telegram.Bot.Requests.Abstractions;
 
 namespace Servus.Akka.Telegram;
 
@@ -39,7 +37,7 @@ public class TelegramIngress : ReceiveActor
 
         Receive<TelegramCommand>(msg =>
         {
-            if (msg.Command == "/start" && msg.Parameters.Count == 1)
+            if (msg.Command == "/start" && msg.Parameters.Length == 1)
             {
                 // user invite!
                 logger.LogDebug("Processing new invite....");

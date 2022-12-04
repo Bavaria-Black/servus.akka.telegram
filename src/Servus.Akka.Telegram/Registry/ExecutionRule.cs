@@ -37,13 +37,14 @@ internal class ExecutionRule
                     command.Parameters.Join(" ")
                 }
             };
-        
-        return RoleMatches(user)
-               && command.Command == _commandName
-               && command.Parameters.Count == _paramCount;
+
+        return RoleMatches(user) && CommandMatches(command);
     }
 
-    private bool RoleMatches(BotUser user)
+    internal  bool CommandMatches(TelegramCommand command) => command.Command == _commandName;
+    internal bool AllParametersSupplied(TelegramCommand command) => command.Parameters.Length == _paramCount;
+
+    internal bool RoleMatches(BotUser user)
     {
         if (_requiredRole == string.Empty && _additionRole == string.Empty)
             return true;
@@ -53,7 +54,7 @@ internal class ExecutionRule
         {
             result &= user.Roles.Contains(_additionRole);
         }
-        
+
         return result || user.Roles.Contains("admin");
     }
 }

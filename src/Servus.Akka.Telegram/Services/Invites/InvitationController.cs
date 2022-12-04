@@ -1,11 +1,10 @@
 using Akka.Actor;
-using Akka.Cluster.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Servus.Akka.Telegram.Hosting;
 using Servus.Akka.Telegram.Hosting.Configuration;
 using Servus.Akka.Telegram.Messages;
 
-namespace Servus.Akka.Telegram.Services;
+namespace Servus.Akka.Telegram.Services.Invites;
 
 public class InvitationController : ReceiveActor
 {

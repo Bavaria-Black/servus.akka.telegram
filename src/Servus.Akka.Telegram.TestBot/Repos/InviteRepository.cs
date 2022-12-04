@@ -1,6 +1,6 @@
 using LanguageExt;
 using MongoDB.Driver;
-using Servus.Akka.Telegram.Services;
+using Servus.Akka.Telegram.Services.Invites;
 
 namespace Servus.Akka.Telegram.TestBot.Repos;
 

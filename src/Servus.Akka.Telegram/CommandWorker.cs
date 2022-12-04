@@ -15,29 +15,47 @@ internal class CommandMap
     {
         private readonly string _command;
         private readonly Action<IList<string>, ChatInformation> _action;
+        private readonly bool _incompleteHandler;
 
-        public CommandMapEntry(string command, Action<IList<string>, ChatInformation> action)
+        public CommandMapEntry(string command, Action<IList<string>, ChatInformation> action, bool incompleteHandler)
         {
             if (!command.StartsWith("/"))
                 command = $"/{command}";
             
             _command = command;
             _action = action;
+            _incompleteHandler = incompleteHandler;
         }
 
         public void Execute(CommandMessage msg)
         {
-            if (msg.Command == _command)
+            if (!_incompleteHandler && msg.Command == _command)
+            {
+                _action(msg.Arguments, msg.ChatInformation);
+            }
+        }
+
+        public void Execute(IncompleteCommandMessage msg)
+        {
+            if (_incompleteHandler && msg.Command == _command)
             {
                 _action(msg.Arguments, msg.ChatInformation);
             }
         }
     }
 
-    public void Add(string command, Action<IList<string>, ChatInformation> action)
-        => _commands.Add(new CommandMapEntry(command, action));
+    public void Add(string command, Action<IList<string>, ChatInformation> action, bool handleIncomplete)
+        => _commands.Add(new CommandMapEntry(command, action, handleIncomplete));
 
     public void Execute(CommandMessage msg)
+    {
+        foreach (var commandMap in _commands)
+        {
+            commandMap.Execute(msg);
+        }
+    }
+
+    public void Execute(IncompleteCommandMessage msg)
     {
         foreach (var commandMap in _commands)
         {
@@ -61,10 +79,14 @@ public abstract class CommandWorker : ReceiveActor
         _egress = registry.Get<TelegramEgress>();
 
         Receive<CommandMessage>(_commandMap.Execute);
+        Receive<IncompleteCommandMessage>(_commandMap.Execute);
     }
 
     protected void RegisterCommand(string command, Action<IList<string>, ChatInformation> action) 
-        => _commandMap.Add(command, action);
+        => _commandMap.Add(command, action, false);
+
+    protected void RegisterIncompleteCommand(string command, Action<IList<string>, ChatInformation> action) 
+        => _commandMap.Add(command, action, true);
 
     protected void ReplyText(string text)
     {
@@ -87,10 +109,14 @@ public abstract class PersistentCommandWorker : ReceivePersistentActor
         _egress = registry.Get<TelegramEgress>();
 
         Command<CommandMessage>(_commandMap.Execute);
+        Command<IncompleteCommandMessage>(_commandMap.Execute);
     }
 
     protected void RegisterCommand(string command, Action<IList<string>, ChatInformation> action) 
-        => _commandMap.Add(command, action);
+        => _commandMap.Add(command, action, false);
+
+    protected void RegisterIncompleteCommand(string command, Action<IList<string>, ChatInformation> action) 
+        => _commandMap.Add(command, action, true);
 
     protected void ReplyText(string text)
     {

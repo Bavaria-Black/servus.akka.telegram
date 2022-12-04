@@ -1,26 +1,17 @@
-﻿using Akka.Actor;
-using Akka.Cluster.Hosting;
-using Akka.DependencyInjection;
-using Akka.Event;
+﻿using Akka.Event;
 using Akka.Hosting;
 using Akka.Logger.Serilog;
-using Akka.Remote.Hosting;
-using Akka.Util;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Serilog;
 using Serilog.Events;
-using Servus.Akka.Telegram;
 using Servus.Akka.Telegram.Hosting;
 using Servus.Akka.Telegram.Hosting.Configuration;
-using Servus.Akka.Telegram.Messages;
-using Servus.Akka.Telegram.Services;
+using Servus.Akka.Telegram.Services.Invites;
 using Servus.Akka.Telegram.TestBot;
-using Servus.Akka.Telegram.TestBot.CommandWorker;
 using Servus.Akka.Telegram.TestBot.Repos;
 using Servus.Akka.Telegram.TestBot.Services;
 using Servus.Akka.Telegram.TestBot.Worker;
@@ -34,20 +25,23 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateLogger();
 
+var configBuilder = new ConfigurationBuilder().AddJsonFile("appsettings.json");
+
+if (File.Exists("appsettings.private.json"))
+    configBuilder.AddJsonFile("appsettings.private.json", false, true);
+
+var configuration = configBuilder.Build();
+
 var host = Host.CreateDefaultBuilder(args)
-    .ConfigureAppConfiguration(app =>
-    {
-        if (File.Exists("appsettings.private.json"))
-            app.AddJsonFile("appsettings.private.json", false, true);
-    })
     .ConfigureServices((context, services) =>
     {
         var conventionPack = new ConventionPack {new IgnoreExtraElementsConvention(true)};
         ConventionRegistry.Register("IgnoreExtraElements", conventionPack, type => true);
 
+        context.Configuration = configuration;
+
         // Register mongo  configuration
-        services.Configure<MongoConfiguration>(
-            context.Configuration.GetSection(MongoConfiguration.Configuration));
+        services.Configure<MongoConfiguration>(configuration.GetSection(MongoConfiguration.Configuration));
 
         // Register named HttpClient to benefits from IHttpClientFactory
         // and consume it with ITelegramBotClient typed client.
@@ -81,10 +75,8 @@ var host = Host.CreateDefaultBuilder(args)
                     })
                     .WithCommandWorker<InviteCreationWorker>("admin", builder => { builder.AddCommand("/test", 1); })
                     .WithCommandWorker<HelloCommandWorker>("admin", builder => { builder.AddCommand("hello"); })
-                    .WithCommandWorker<StartStopCommandWorker>("test", builder =>
-                    {
-                        builder.AddCommand("/begin").AddCommand("end").AddCommand("time");
-                    });
+                    .WithCommandWorker<StartStopCommandWorker>("test",
+                        builder => { builder.AddCommand("/begin").AddCommand("end").AddCommand("time"); });
             })
             .AddScoped<IBotUserRepository, BotUserRepository>()
             .AddScoped<IInviteRepository, InviteRepository>()
@@ -104,20 +96,3 @@ var host = Host.CreateDefaultBuilder(args)
     .Build();
 
 await host.RunAsync();
-
-namespace Servus.Akka.Telegram.TestBot
-{
-    public class MongoConfiguration
-    {
-        public static readonly string Configuration = "MongoConfiguration";
-
-        public string Host { get; set; } = "cluster0.xvksw1g.mongodb.net";
-        public int Port { get; set; } = 27017;
-        public string Username { get; set; } = "damask";
-        public string Password { get; set; } = "niAVhuI5feCap0gt";
-        public string Database { get; set; } = "damask";
-
-        public string GetConnectionString()
-            => $"mongodb+srv://{Username}:{Password}@{Host}/{Database}";
-    }
-}

@@ -1,4 +1,4 @@
-namespace Servus.Akka.Telegram.Services;
+namespace Servus.Akka.Telegram.Services.Invites;
 
 internal static class InviteCodeGenerator
 {
