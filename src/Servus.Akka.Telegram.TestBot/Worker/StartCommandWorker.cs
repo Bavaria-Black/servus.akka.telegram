@@ -3,9 +3,9 @@ using Microsoft.Extensions.Logging;
 using Servus.Akka.Telegram.Messages;
 using Servus.Akka.Telegram.Users;
 
-namespace Servus.Akka.Telegram.TestBot.CommandWorker;
+namespace Servus.Akka.Telegram.TestBot.Worker;
 
-public class StartCommandWorker : Telegram.CommandWorker
+public class StartCommandWorker : CommandWorker
 {
     public StartCommandWorker(BotUser user, ActorRegistry registry, ILogger<StartCommandWorker> logger) : base(user, registry, logger)
     {

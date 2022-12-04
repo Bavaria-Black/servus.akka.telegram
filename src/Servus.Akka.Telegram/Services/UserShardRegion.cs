@@ -1,12 +1,10 @@
 using Akka.Actor;
 using Akka.Hosting;
-using Akka.IO;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Servus.Akka.Telegram.Messages;
 using Servus.Akka.Telegram.Registry;
 using Servus.Akka.Telegram.Users;
-using Telegram.Bot.Types;
 
 namespace Servus.Akka.Telegram.Services;
 
@@ -64,7 +62,7 @@ public class UserShardRegion : ReceiveActor
                 if (worker.IsNobody())
                 {
                     var prop = propFac(_user);
-                    _logger.LogDebug("Creating new worker [{WorkerType}] for command [{TelegramCommand}] with [{ArgumentCount}] arguments", prop.TypeName, msg.Command, msg.Parameters.Count);
+                    _logger.LogDebug("Creating new worker [{WorkerType}] for command [{TelegramCommand}] with [{ArgumentCount}] arguments", prop.TypeName, msg.Command, msg.Parameters.Length);
                     worker = Context.ActorOf(prop, workerId);
                 }
                 

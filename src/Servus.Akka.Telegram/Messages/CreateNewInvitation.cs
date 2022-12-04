@@ -1,4 +1,4 @@
-using Servus.Akka.Telegram.Services;
+using Servus.Akka.Telegram.Services.Invites;
 using Servus.Akka.Telegram.Users;
 
 namespace Servus.Akka.Telegram.Messages;

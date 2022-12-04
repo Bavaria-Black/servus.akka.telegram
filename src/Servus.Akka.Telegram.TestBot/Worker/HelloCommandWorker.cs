@@ -2,9 +2,9 @@ using Akka.Hosting;
 using Microsoft.Extensions.Logging;
 using Servus.Akka.Telegram.Users;
 
-namespace Servus.Akka.Telegram.TestBot.CommandWorker;
+namespace Servus.Akka.Telegram.TestBot.Worker;
 
-public class HelloCommandWorker : Telegram.CommandWorker
+public class HelloCommandWorker : CommandWorker
 {
     public HelloCommandWorker(BotUser user, ActorRegistry registry, ILogger<StartStopCommandWorker> logger) : base(user, registry, logger)
     {

@@ -40,7 +40,7 @@ internal class ExecutionRule
         
         return RoleMatches(user)
                && command.Command == _commandName
-               && command.Parameters.Count == _paramCount;
+               && command.Parameters.Length == _paramCount;
     }
 
     private bool RoleMatches(BotUser user)
