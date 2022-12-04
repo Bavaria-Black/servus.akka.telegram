@@ -27,20 +27,21 @@ public class UserShardRegion : ReceiveActor
         _scope = sp.CreateScope();
         _userRepository = _scope.ServiceProvider.GetRequiredService<IBotUserRepository>();
         _commandRegistry = WorkerRegistry.For(Context.System);
-        
+
         var registry = _scope.ServiceProvider.GetRequiredService<IActorRegistry>();
         _egress = registry.Get<TelegramEgress>();
     }
+
     protected override void PreStart()
     {
         _userRepository.GetBotUser(_userId).Some(u =>
-        { 
+        {
             _user = u;
             if (_user.IsEnabled)
             {
                 Become(Ready);
             }
-            else if(!_user.IsBanned)
+            else if (!_user.IsBanned)
             {
                 Become(Disabled);
             }
@@ -56,39 +57,41 @@ public class UserShardRegion : ReceiveActor
         Receive<TelegramCommand>(msg =>
         {
             _logger.LogDebug("Known user received message of type {TypeName}", msg.GetType().Name);
-            var executed = _commandRegistry.CheckAndExecute(msg, _user, (propFac, workerId) =>
+            var executed = _commandRegistry.CheckAndExecute(msg, _user, (propFac, workerId, message) =>
             {
                 var worker = Context.Child(workerId);
                 if (worker.IsNobody())
                 {
                     var prop = propFac(_user);
-                    _logger.LogDebug("Creating new worker [{WorkerType}] for command [{TelegramCommand}] with [{ArgumentCount}] arguments", prop.TypeName, msg.Command, msg.Parameters.Length);
+                    _logger.LogDebug(
+                        "Creating new worker [{WorkerType}] for command [{TelegramCommand}] with [{ArgumentCount}] arguments",
+                        prop.TypeName, msg.Command, msg.Parameters.Length);
                     worker = Context.ActorOf(prop, workerId);
                 }
-                
-                worker.Tell(new CommandMessage(msg.Command, msg.ChatInformation, msg.Parameters));
+
+                worker.Tell(message);
             });
 
+
             if (!executed)
-            {
                 _egress.Tell(new SendTextMessage(msg.UserId, "Unrecognized command. Say what?"));
-            }
         });
-        
+
         ReceiveAny(msg =>
         {
-            _logger.LogDebug("Known user received unhandled message of type {TypeName}", msg.GetType().Name);    
-        });   
+            _logger.LogDebug("Known user received unhandled message of type {TypeName}", msg.GetType().Name);
+        });
     }
 
     private void Disabled()
     {
         _logger.LogDebug("BECOME disabled for user [{UserId}] [{UserName}]", _userId, _user.GetNameString());
-        
+
         ReceiveAny(msg =>
         {
-            _logger.LogWarning("User [{UserId}] [{UserName}] is currently disabled. All messaged being dropped!", _userId, _user.GetNameString());            
-        });   
+            _logger.LogWarning("User [{UserId}] [{UserName}] is currently disabled. All messaged being dropped!",
+                _userId, _user.GetNameString());
+        });
     }
 
     private void NewUser()

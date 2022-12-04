@@ -31,6 +31,11 @@ public class InviteCreationWorker : CommandWorker
         });
         
         RegisterCommand("/test", ProcessCommand);
+        
+        RegisterIncompleteCommand("/test", (list, _) =>
+        {
+            ReplyText($"It is one parameter required to execute your command! You supplied: {list.Count}]");
+        });
     }
 
     private void ProcessCommand(IList<string> args, ChatInformation chatInfo)
